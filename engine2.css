@@ -1,0 +1,197 @@
+/* ═══════════════════════════════════════════════════════════════
+   ENGINE v2 — band/grid layout engine (declarative, no runtime snap)
+   See ENGINE2_新架构设计.md. Sites own :root tokens; bands own their
+   vertical geometry via data attributes; columns are pure CSS.
+   Everything after the DEV-ONLY marker is stripped on publish.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── Reset ─── */
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+/* ─── Fonts ─── */
+
+html { overflow-x:hidden; }
+body {
+  font-family: var(--font-sans, 'Lab Grotesque', system-ui, sans-serif);
+  background: var(--c-bg, #fff);
+  color: var(--c-ink, #000);
+  font-size: 16px;
+  line-height: calc(var(--unit, 8px) * 3);
+  overflow-x: hidden;
+}
+/* Links inherit color by default: reconstruction fidelity beats a global
+   token override (v1's a:not(.arena-nav a) specificity overrode component
+   colors and made footer links invisible on two sites). */
+a { color: inherit; }
+img, video { display:block; max-width:100%; }
+
+/* ═══════ BANDS (vertical primitive) ═══════ */
+.band, [data-band] {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: var(--band-h, auto);
+  isolation: isolate; /* negative-z children layer above the band bg, below flow content */
+}
+[data-band][data-clip] { height: var(--band-h, auto); min-height: 0; overflow: clip; }
+
+/* data-distribute: place rows within the authored height.
+   Default: a single .g fills the band; with data-distribute the rows must
+   NOT grow, otherwise flex-grow consumes the free space justify-content
+   would distribute. */
+[data-band] > .g { flex: 1 0 auto; }
+[data-distribute] > .g { flex: 0 0 auto; }
+[data-distribute="start"]   { justify-content: flex-start; }
+[data-distribute="center"]  { justify-content: center; }
+[data-distribute="end"]     { justify-content: flex-end; }
+[data-distribute="between"] { justify-content: space-between; }
+
+/* Overlay nav: stacked over the following band, takes no flow height */
+[data-band="nav"][data-nav="overlay"] {
+  position: absolute; top: 0; left: 0; right: 0;
+  min-height: 0; height: var(--band-h, auto);
+  z-index: 100;
+}
+
+/* Media bleed: one .media child fills the whole band edge-to-edge,
+   the .g lays on top of it as the overlay layer */
+[data-bleed="media"] > .media {
+  position: absolute; inset: 0; z-index: 0; overflow: hidden;
+}
+[data-bleed="media"] > .media > img,
+[data-bleed="media"] > .media > video { width:100%; height:100%; object-fit:cover; }
+[data-bleed="media"] > .g { position: relative; z-index: 1; }
+
+/* ═══════ GRID (horizontal primitive) ═══════ */
+.g {
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 12), 1fr);
+  column-gap: var(--gutter, 16px);
+  align-items: start; /* grid's default stretch equalizes card heights — wrong for cards with backgrounds */
+  width: 100%;
+  max-width: var(--max-w, 1280px);
+  margin-left: auto; margin-right: auto;
+  padding-left: var(--margin-l, var(--margin, 0px));
+  padding-right: var(--margin-r, var(--margin, 0px));
+}
+/* Column placement is static CSS — no JS involved.
+   `auto / span N` keeps start and end in separate longhands so a later
+   [data-start] rule composes instead of collapsing the span to one track. */
+[data-span="1"]  { grid-column: auto / span 1; }  [data-span="2"]  { grid-column: auto / span 2; }
+[data-span="3"]  { grid-column: auto / span 3; }  [data-span="4"]  { grid-column: auto / span 4; }
+[data-span="5"]  { grid-column: auto / span 5; }  [data-span="6"]  { grid-column: auto / span 6; }
+[data-span="7"]  { grid-column: auto / span 7; }  [data-span="8"]  { grid-column: auto / span 8; }
+[data-span="9"]  { grid-column: auto / span 9; }  [data-span="10"] { grid-column: auto / span 10; }
+[data-span="11"] { grid-column: auto / span 11; } [data-span="12"] { grid-column: auto / span 12; }
+[data-start="1"]  { grid-column-start: 1; }  [data-start="2"]  { grid-column-start: 2; }
+[data-start="3"]  { grid-column-start: 3; }  [data-start="4"]  { grid-column-start: 4; }
+[data-start="5"]  { grid-column-start: 5; }  [data-start="6"]  { grid-column-start: 6; }
+[data-start="7"]  { grid-column-start: 7; }  [data-start="8"]  { grid-column-start: 8; }
+[data-start="9"]  { grid-column-start: 9; }  [data-start="10"] { grid-column-start: 10; }
+[data-start="11"] { grid-column-start: 11; } [data-start="12"] { grid-column-start: 12; }
+
+/* Free placement escape hatch (contract: only inside data-h bands,
+   coordinates relative to the 1280px-desktop band box) */
+.free { position: absolute; }
+
+/* ═══════ MEDIA GEOMETRY ═══════ */
+/* Placeholder and real image share one geometry system: --ar owns the box,
+   the pixels never shift layout. */
+.media { position: relative; overflow: hidden; }
+.media[style*="--ar"] { aspect-ratio: var(--ar); }
+.media > img, .media > video { width: 100%; height: 100%; object-fit: cover; }
+.media:empty { background: color-mix(in srgb, var(--c-ink, #000) 12%, transparent); }
+
+/* ═══════ TYPOGRAPHY (v1 vocabulary preserved) ═══════ */
+.th1 { font-family:var(--font-serif, var(--font-sans)); font-size:var(--type-h1-size); line-height:var(--type-h1-lh); font-weight:var(--type-h1-wt, 400); letter-spacing:-.02em; }
+.th2 { font-size:var(--type-h2-size); line-height:var(--type-h2-lh); font-weight:var(--type-h2-wt, 400); letter-spacing:-.01em; }
+.th3 { font-size:var(--type-h3-size); line-height:var(--type-h3-lh); font-weight:var(--type-h3-wt, 400); }
+.tb  { font-size:var(--type-body-size); line-height:var(--type-body-lh); color:var(--c-body); }
+.ts  { font-size:var(--type-small-size); line-height:var(--type-small-lh); color:var(--c-muted); }
+.tl  { font-size:var(--type-cap-size); line-height:var(--type-cap-lh); font-weight:700; letter-spacing:.15em; text-transform:uppercase; color:var(--c-muted); }
+.td  { font-family:var(--font-mono, monospace); font-variant-numeric:tabular-nums; }
+
+/* ═══════ SURFACES ═══════ */
+.bg-alt  { background:var(--c-bg-alt);  color:var(--c-on-alt,  inherit); }
+.bg-dark { background:var(--c-bg-dark); color:var(--c-on-dark, #fff); }
+.bg-s1   { background:var(--c-bg-s1);   color:var(--c-on-s1,   inherit); }
+.bg-s2   { background:var(--c-bg-s2);   color:var(--c-on-s2,   inherit); }
+
+/* Oversized display text (giant wordmarks): line-height 1 keeps glyph ink
+   inside the line box so it doesn't inflate scrollHeight and false-trigger
+   the band-overflow check; pair with data-clip on the band to crop exactly. */
+.display { line-height: 1; white-space: nowrap; }
+
+.btn-w { display:inline-block; padding:12px 24px; border:1px solid currentColor; border-radius:var(--radius-full, 9999px); font-size:14px; line-height:16px; text-decoration:none; cursor:pointer; background:transparent; }
+.btn-w.filled { background:var(--c-accent); border-color:var(--c-accent); color:var(--c-on-accent, #fff); }
+
+/* ═══════ ENTRY ANIMATIONS (ported from v1, attribute-compatible) ═══════ */
+@keyframes anim-fade-in     { from { opacity:0 } to { opacity:1 } }
+@keyframes anim-slide-up    { from { opacity:0; transform:translateY(32px) } to { opacity:1; transform:translateY(0) } }
+@keyframes anim-slide-down  { from { opacity:0; transform:translateY(-32px) } to { opacity:1; transform:translateY(0) } }
+@keyframes anim-slide-left  { from { opacity:0; transform:translateX(-32px) } to { opacity:1; transform:translateX(0) } }
+@keyframes anim-slide-right { from { opacity:0; transform:translateX(32px) } to { opacity:1; transform:translateX(0) } }
+@keyframes anim-scale-in    { from { opacity:0; transform:scale(0.92) } to { opacity:1; transform:scale(1) } }
+[data-anim]:not([data-anim="none"]):not(.anim-visible) { opacity:0; will-change:opacity,transform; }
+[data-anim].anim-visible { animation-duration:var(--anim-duration, 0.6s); animation-timing-function:var(--anim-easing, cubic-bezier(0.22,1,0.36,1)); animation-fill-mode:both; }
+[data-anim="fade-in"].anim-visible      { animation-name:anim-fade-in }
+[data-anim="slide-up"].anim-visible     { animation-name:anim-slide-up }
+[data-anim="slide-down"].anim-visible   { animation-name:anim-slide-down }
+[data-anim="slide-left"].anim-visible   { animation-name:anim-slide-left }
+[data-anim="slide-right"].anim-visible  { animation-name:anim-slide-right }
+[data-anim="scale-in"].anim-visible     { animation-name:anim-scale-in }
+[data-anim-delay].anim-visible { animation-delay:calc(var(--anim-stagger, 0) * 1ms) }
+/* After the entry animation ends the element must return to author styles:
+   fill-mode:both would otherwise pin the final keyframe transform forever,
+   overriding any author transform (e.g. a scaled wordmark). */
+[data-anim].anim-done { animation: none !important; }
+
+/* ═══════ RESPONSIVE ═══════ */
+@media (max-width: 1024px) {
+  [data-band] { min-height: 0; }
+  [data-band][data-clip] { height: auto; overflow: visible; }
+  .g { grid-template-columns: repeat(var(--bp-lg-cols, var(--cols, 12)), 1fr); }
+}
+@media (max-width: 768px) {
+  .free { position: static; }
+  .g { grid-template-columns: repeat(var(--bp-md-cols, 2), 1fr); padding-left: var(--bp-md-margin, 24px); padding-right: var(--bp-md-margin, 24px); column-gap: var(--bp-md-gutter, 16px); }
+  .g > [data-span] { grid-column: 1 / -1; }
+  /* Material-style column step-down: opt into narrow-viewport spans instead
+     of the full-width default (12→N degradation, GRID_THEORY §5) */
+  .g > [data-span-md="1"] { grid-column: auto / span 1; }
+  .g > [data-span-md="2"] { grid-column: auto / span 2; }
+  .g > [data-span-md="3"] { grid-column: auto / span 3; }
+  .g > [data-span-md="4"] { grid-column: auto / span 4; }
+  [data-hide-md] { display:none; }
+}
+@media (max-width: 640px) {
+  .g { grid-template-columns: repeat(var(--bp-sm-cols, 1), 1fr); padding-left: var(--bp-sm-margin, 16px); padding-right: var(--bp-sm-margin, 16px); column-gap: var(--bp-sm-gutter, 0px); }
+  [data-hide-sm] { display:none; }
+}
+
+/* ═══ DEV-ONLY (stripped on publish — keep this marker) ═══ */
+
+/* Column overlay */
+.ov { position:absolute; top:0; left:0; right:0; pointer-events:none; z-index:9000; display:none; }
+.ov.on { display:block; }
+#ovCol { display:none; margin:0 auto; max-width:var(--max-w, 1280px); padding:0 var(--margin-r, var(--margin, 0px)) 0 var(--margin-l, var(--margin, 0px)); height:100%; }
+#ovCol.on { display:grid; grid-template-columns:repeat(var(--cols, 12), 1fr); column-gap:var(--gutter, 16px); }
+#ovCol > div { background:var(--ov-color, rgba(232,93,4,.18)); height:100%; }
+#ovBase { background:repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--unit, 8px) - 1px), rgba(0,140,255,.25) calc(var(--unit, 8px) - 1px), rgba(0,140,255,.25) var(--unit, 8px)); }
+
+/* Minimal panel */
+.ctrl { position:fixed; top:16px; right:16px; z-index:10000; background:#fff; border:1px solid #e2e2e2; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,.10); padding:14px; width:230px; font:400 12px/18px 'Lab Grotesque', system-ui, sans-serif; color:#333; }
+.ctrl.collapsed { display:none; }
+.ctrl label { display:flex; align-items:center; gap:6px; cursor:pointer; margin-bottom:8px; }
+.ctrl .inp-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.ctrl .inp-row input { width:56px; height:26px; border:1px solid #ddd; border-radius:5px; font:700 12px/24px 'Lab Grotesque', system-ui, sans-serif; text-align:center; }
+.ctrl .inp-label { font:400 11px/14px 'Lab Grotesque', system-ui, sans-serif; color:#888; }
+.ctrl .sbtn { display:block; width:100%; margin-bottom:6px; padding:7px 0; border:1px solid #ddd; border-radius:6px; background:#fff; font:700 11px/14px 'Lab Grotesque', system-ui, sans-serif; cursor:pointer; }
+.ctrl .sbtn:hover { background:#f5f5f5; }
+.ctrl-toggle { position:fixed; top:16px; right:16px; z-index:9999; width:36px; height:36px; border-radius:50%; border:1px solid #e2e2e2; background:#fff; box-shadow:0 2px 12px rgba(0,0,0,.10); cursor:pointer; font-size:16px; display:none; }
+.ctrl-toggle.show { display:block; }
+#v2badge { margin-top:6px; font:600 11px/16px monospace; white-space:pre-wrap; }
+#v2badge.ok { color:#0a7d38; }
+#v2badge.warn { color:#a06a00; }
+#v2badge.fail { color:#b32020; }

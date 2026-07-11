@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>格律 Gelü — AI 生成网页的发布前验收</title>
+<meta name="description" content="格律给大模型一套布局契约：客观错误——字体未加载、图片破损、内容溢出、列越界——发布前全部拦截。不给美打分，只保证不坏。">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23111"/><text x="50" y="72" font-size="64" text-anchor="middle" fill="%23fff" font-family="Songti SC,serif">格</text></svg>'>
+<link rel="stylesheet" href="engine2.css">
+<style>
+:root {
+  --unit: 8px; --cols: 12; --gutter: 16px; --margin-l: 32px; --margin-r: 32px; --max-w: 1280px;
+  --font-sans: system-ui, -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-serif: Georgia, 'Songti SC', 'STSong', 'SimSun', serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --c-bg: #ffffff; --c-bg-alt: #f4f4f2; --c-bg-dark: #111110;
+  --c-ink: #111110; --c-body: #34342f; --c-muted: #75756d;
+  --c-accent: #c8321e; --c-on-accent: #ffffff; --c-on-dark: #ffffff;
+  --c-border: #e3e3df;
+  --type-h1-size: 64px;  --type-h1-lh: 84px;  --type-h1-wt: 400;
+  --type-h2-size: 34px;  --type-h2-lh: 56px;  --type-h2-wt: 600;
+  --type-h3-size: 19px;  --type-h3-lh: 28px;  --type-h3-wt: 600;
+  --type-body-size: 16px; --type-body-lh: 28px;
+  --type-small-size: 13px; --type-small-lh: 20px;
+  --type-cap-size: 12px;  --type-cap-lh: 16px;
+  --radius-full: 9999px;
+}
+.brand { font-family: var(--font-serif); font-weight: 700; }
+.brand-hero { font-size: clamp(112px, 17vw, 216px); letter-spacing: .04em; }
+.accent { color: var(--c-accent); }
+.nav-links a { text-decoration: none; margin-left: 24px; font-size: 14px; }
+.nav-links a:hover { color: var(--c-accent); }
+#v2badge { text-align: right; }
+.lead { max-width: 620px; }
+.kicker { margin-bottom: 24px; }
+.sec-pad { padding-top: 96px; padding-bottom: 96px; }
+.hr-top { border-top: 1px solid var(--c-border); }
+.card { border-top: 2px solid var(--c-ink); padding-top: 16px; }
+.card .num { font-family: var(--font-mono); font-size: 13px; color: var(--c-muted); display: block; margin-bottom: 8px; }
+.stat .td { font-size: 34px; line-height: 44px; letter-spacing: -.01em; display: block; }
+.stat .ts { display: block; margin-top: 4px; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.btn-w:hover { border-color: var(--c-accent); color: var(--c-accent); }
+.btn-w.filled:hover { color: var(--c-on-accent); opacity: .9; }
+.bg-dark .btn-w:hover { border-color: #fff; color: #fff; background: rgba(255,255,255,.08); }
+.bg-dark .btn-w.filled:hover { border-color: var(--c-accent); background: var(--c-accent); opacity: 1; }
+#gl-console { background: #060606; border: 1px solid #2c2c2a; height: 288px; overflow-y: auto; padding: 16px; font-family: var(--font-mono); font-size: 12.5px; line-height: 20px; }
+.gl-line { white-space: pre-wrap; word-break: break-all; color: #c9c9c2; }
+.gl-line.err  { color: #ff6d5c; }
+.gl-line.warn { color: #e0a83a; }
+.gl-line.ok   { color: #5bd68a; }
+.gl-line.act  { color: #8fc7ff; }
+.gl-line.dim  { color: #77776f; }
+.shot { border: 1px solid var(--c-border); }
+.shot img { object-position: top; }
+.compare-label { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.on-dark-body { color: #b9b9b2; }
+.on-dark-muted { color: #8b8b84; }
+footer a { text-decoration: none; }
+footer a:hover { color: #fff; }
+@media (max-width: 768px) {
+  .sec-pad { padding-top: 56px; padding-bottom: 56px; }
+  :root { --type-h1-size: 40px; --type-h1-lh: 56px; --type-h2-size: 26px; --type-h2-lh: 42px; }
+}
+</style>
+</head>
+<body data-slug="gelv">
+
+<!-- ═══ NAV ═══ -->
+<header data-band="nav" data-h="64">
+  <div class="g" style="align-content:center">
+    <div data-span="4" style="display:flex;align-items:baseline;gap:12px">
+      <span class="brand" style="font-size:22px">格律</span>
+      <span class="tl">Gelü · Engine v2</span>
+    </div>
+    <nav class="nav-links ts" data-span="4" data-start="5" data-hide-md style="text-align:center;align-self:center">
+      <a href="#demo">现场破坏</a><a href="#fidelity">重建保真</a><a href="#experiment">证伪实验</a>
+    </nav>
+    <div data-span="4" data-start="9" style="align-self:center">
+      <div class="compare-label" style="margin:0;justify-content:flex-end;gap:10px">
+        <span class="ts">本页实时验收</span><span id="v2badge" class="td"></span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ HERO ═══ -->
+<section data-band="hero" data-h="720" data-clip class="hr-top">
+  <div class="g" style="align-content:center;padding-top:48px">
+    <div data-span="12">
+      <p class="tl kicker accent" data-anim="fade-in">Layout Contract &amp; Acceptance — 布局契约与验收</p>
+      <h1 class="brand brand-hero display" data-anim="slide-up">格律</h1>
+      <h2 class="th2" style="margin-top:24px;max-width:720px" data-anim="fade-in" data-anim-delay="150">AI 会写网页了。谁来验收？</h2>
+      <p class="tb lead" style="margin-top:16px" data-anim="fade-in" data-anim-delay="300">
+        格律给大模型一套排版契约：布局交给 CSS，客观错误——字体未加载、图片破损、内容溢出、列越界——发布前全部拦截。
+        不给「美」打分，只保证不坏：美留给人或模型，下限由引擎守住。
+      </p>
+      <div class="btn-row" style="margin-top:32px" data-anim="fade-in" data-anim-delay="450">
+        <a class="btn-w filled" href="#demo">当场破坏这个页面 ↓</a>
+        <a class="btn-w" href="#fidelity">重建保真 0.989</a>
+      </div>
+    </div>
+  </div>
+  <div class="free ts" style="left:32px;bottom:20px" data-anim="fade-in" data-anim-delay="600">
+    本页由格律 v2 构建 · 加载即通过自身验收 · 右上 ⚙ 可打开 12 列网格叠加层
+  </div>
+  <div class="free td ts" style="right:32px;bottom:20px" data-hide-md data-anim="fade-in" data-anim-delay="600">
+    engine2.js · 392 lines
+  </div>
+</section>
+
+<!-- ═══ 问题 ═══ -->
+<section data-band="section" class="bg-alt">
+  <div class="g sec-pad">
+    <div data-span="5"><h2 class="th2">失败是无声的</h2></div>
+    <div data-span="7">
+      <p class="tb">AI 生成页面的错误不报错：字体拿不到就悄悄换一个，容器装不下就悄悄溢出去，栅格坏了就悄悄挤成一列。
+      页面越生成越多，人肉逐页检查的成本，正在吃掉 AI 省下的时间。</p>
+    </div>
+    <div data-span="4" class="card" style="margin-top:56px">
+      <span class="num">01</span>
+      <h3 class="th3">字体静默回退</h3>
+      <p class="ts" style="margin-top:8px">字体文件没加载成功，浏览器默默换成备选——字宽变了，所有排版度量随之漂移，页面不会说一个字。</p>
+    </div>
+    <div data-span="4" class="card" style="margin-top:56px">
+      <span class="num">02</span>
+      <h3 class="th3">内容悄悄溢出</h3>
+      <p class="ts" style="margin-top:8px">文案比设计长一点，内容就挤出容器边界。截图看不出，真机上就是破版。</p>
+    </div>
+    <div data-span="4" class="card" style="margin-top:56px">
+      <span class="num">03</span>
+      <h3 class="th3">栅格悄然坍塌</h3>
+      <p class="ts" style="margin-top:8px">一条样式覆盖，本该占八列的元素塌成一列——布局意图丢了，DOM 里却查不出任何「错误」。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 现场破坏 ═══ -->
+<section data-band="section" class="bg-dark" id="demo">
+  <div class="g sec-pad">
+    <div data-span="7">
+      <p class="tl accent kicker">Live Demo · 现场演示</p>
+      <h2 class="th2">别听介绍，当场破坏这个页面</h2>
+    </div>
+    <div data-span="5">
+      <p class="tb on-dark-body">下面的按钮直接作用于你正在看的这一页。前三个各制造一种真实事故；「模拟发布」走的是引擎发布门禁的同一套校验；「全部修复」还原现场。</p>
+    </div>
+    <div data-span="12" class="btn-row" style="margin-top:40px">
+      <button class="btn-w" id="btn-font" type="button">① 弄坏字体</button>
+      <button class="btn-w" id="btn-band" type="button">② 撑爆版块</button>
+      <button class="btn-w" id="btn-img" type="button">③ 打断图片</button>
+      <span style="width:16px"></span>
+      <button class="btn-w filled" id="btn-publish" type="button">尝试发布 →</button>
+      <button class="btn-w" id="btn-fix" type="button">全部修复</button>
+    </div>
+    <div data-span="12" style="margin-top:24px" id="gl-console" aria-live="polite"></div>
+    <div data-span="12" style="margin-top:16px">
+      <p class="ts on-dark-muted">提示：「弄坏字体」这一刀肉眼几乎看不出来——这正是问题本身：你看不出来，验收器看得出来。校验器是只读的，只报客观失败；风格问题只警告、不强制。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 祭品版块 ═══ -->
+<section data-band="section" data-h="568" id="victim">
+  <div class="g" style="align-content:center;padding-top:48px;padding-bottom:48px">
+    <div data-span="5" style="align-self:center">
+      <p class="tl kicker">示例版块 · 契约 data-h=568</p>
+      <h3 class="th2">一个规规矩矩的版块</h3>
+      <p class="tb" style="margin-top:16px;max-width:420px">标题、正文、一张图，各占其位：文字五列，图七列，高度 568px 写进契约。
+      上面的破坏实验，砸的就是这个版块——和整页的字体。</p>
+    </div>
+    <div data-span="7" style="align-self:center">
+      <div class="media shot" style="--ar:3/2"><img id="victimImg" src="assets/gelv/clay-generated.png" alt="格律 v2 重建站截图（示例图）"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 重建保真 ═══ -->
+<section data-band="section" class="bg-alt" id="fidelity">
+  <div class="g sec-pad">
+    <div data-span="6">
+      <h2 class="th2">契约管下限，保真到 0.989</h2>
+    </div>
+    <div data-span="6">
+      <p class="tb">用格律 v2 重建 clay.global 首页：动手之前先把通过线写死在 0.65，重建完成后与原站的像素相似度 0.989（平均像素差 2.1/255）。
+      下面是两张完整页面的长图截图顶部。</p>
+    </div>
+    <div data-span="6" style="margin-top:48px">
+      <div class="compare-label"><span class="tl">原站 clay.global</span><span class="ts td">1280 × 15668</span></div>
+      <div class="media shot" style="--ar:4/5"><img src="assets/gelv/clay-original.png" alt="clay.global 原站完整页截图（顶部）"></div>
+    </div>
+    <div data-span="6" style="margin-top:48px">
+      <div class="compare-label"><span class="tl accent">格律 v2 重建</span><span class="ts td">similarity 0.989</span></div>
+      <div class="media shot" style="--ar:4/5"><img src="assets/gelv/clay-generated.png" alt="格律 v2 重建站完整页截图（顶部）"></div>
+    </div>
+    <div data-span="3" class="stat" style="margin-top:48px"><span class="td">0.989</span><span class="ts">像素相似度（预设线 0.65）</span></div>
+    <div data-span="3" class="stat" style="margin-top:48px"><span class="td">0.956</span><span class="ts">第二个试点站（预设线 0.75）</span></div>
+    <div data-span="3" class="stat" style="margin-top:48px"><span class="td">9 / 10</span><span class="ts">重建站保真 ≥ 0.89</span></div>
+    <div data-span="3" class="stat" style="margin-top:48px"><span class="td">392 行</span><span class="ts">v2 运行时（v1 为 1557 行）</span></div>
+    <div data-span="12" style="margin-top:32px">
+      <p class="ts">原站截图版权归 clay.global 所有，仅作研究对比。保真度衡量的是与原站的像素相似度——这是布局能力的证据，不是审美评分。通过线在动手之前写死，时间戳可查。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 证伪实验 ═══ -->
+<section data-band="section" id="experiment">
+  <div class="g sec-pad">
+    <div data-span="7">
+      <p class="tl accent kicker">The Falsification · 证伪实验</p>
+      <h2 class="th2">为什么只做验收、不打分？<br>因为我们把「打分」亲手证伪了</h2>
+      <p class="tb" style="margin-top:24px">2026 年 7 月，我们给自己的美学打分器设计了一个刻意证伪它的实验：盲采样、顶级人类名站做上限锚、一个约 25 行的作弊脚本做对照、两组指标永不混算。</p>
+      <p class="tb" style="margin-top:16px">结果：作弊脚本——只会把间距四舍五入到 8px 网格——在网格指标上拿了 78.70 分，高过我们 1535 行的引擎，也高过人类名站的组均值。而免费大模型直出的页面，在权威可读性上组均 90.36，排在人类名站组均值之上。</p>
+      <p class="tb" style="margin-top:16px"><strong>结论写进了产品：任何确定性的「美学分数」都会被刷穿。确定性属于契约（保下限），不属于审美（打分）。</strong>格律因此只拦截客观错误、只警告不强制风格——这是一款知道自己不该做什么的引擎。</p>
+    </div>
+    <div data-span="4" data-start="9">
+      <div class="card"><span class="num">网格指标 · 组均</span>
+        <p class="td" style="font-size:22px;line-height:32px">78.70 <span class="ts">作弊脚本（约 25 行）</span><br>67.73 <span class="ts">引擎 v1（1535 行）</span><br>72.98 <span class="ts">人类名站组均</span></p>
+      </div>
+      <div class="card" style="margin-top:32px"><span class="num">权威可读性 · 组均</span>
+        <p class="td" style="font-size:22px;line-height:32px">90.36 <span class="ts">AI 直出</span><br>82.18 <span class="ts">人类名站组均</span></p>
+      </div>
+      <div class="card" style="margin-top:32px"><span class="num">窄屏重排（多约束同时满足）</span>
+        <p class="td" style="font-size:22px;line-height:32px">97.65 <span class="ts">引擎</span><br>41.80 <span class="ts">作弊脚本刷分的代价</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer data-band="footer" data-h="320" data-distribute="between" class="bg-dark">
+  <div class="g" style="padding-top:64px">
+    <div data-span="7">
+      <span class="brand" style="font-size:40px">格律 <span class="tl" style="font-size:12px">Gelü</span></span>
+      <p class="tb on-dark-body" style="margin-top:16px;max-width:480px">AI 产出的质量层：下限用契约保证，上限用可信的评测逼近。先有格律，再有诗。</p>
+    </div>
+    <div data-span="4" data-start="9">
+      <p class="tl on-dark-muted">Contact · 联系</p>
+      <p class="ts on-dark-body" style="margin-top:12px">申请材料与完整实验报告备索<br><span class="td">【邮箱待填】</span></p>
+    </div>
+  </div>
+  <div class="g" style="padding-bottom:24px">
+    <div data-span="8"><span class="ts on-dark-muted">本页由格律 v2 构建（band/grid 契约 + 只读校验器 + 发布门禁），加载时已通过自身验收。© 2026 格律</span></div>
+    <div data-span="4" style="text-align:right"><span class="ts td on-dark-muted">band/grid · validate() · publish gate</span></div>
+  </div>
+</footer>
+
+<script src="engine2.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var state = { font: false, band: false, img: false };
+
+  function log(msg, cls) {
+    var c = $('#gl-console'); if (!c) return;
+    var line = document.createElement('div');
+    line.className = 'gl-line' + (cls ? ' ' + cls : '');
+    line.textContent = msg;
+    c.appendChild(line);
+    c.scrollTop = c.scrollHeight;
+  }
+
+  function runValidate(label) {
+    return window.__v2Validate().then(function (r) {
+      log('$ validate — ' + label, 'dim');
+      if (!r.errors.length && !r.warnings.length) {
+        log('✓ 0 errors · 0 warnings — 契约成立', 'ok');
+      }
+      r.errors.forEach(function (e) { log('✕ ' + e, 'err'); });
+      r.warnings.forEach(function (w) { log('⚠ ' + w, 'warn'); });
+      if (r.infos.length) log('ℹ ' + r.infos.length + ' 条信息（网格节奏、行高比等，不拦截）', 'dim');
+      return r;
+    });
+  }
+
+  $('#btn-font').addEventListener('click', function () {
+    document.documentElement.style.setProperty('--font-sans', '"Ghost Grotesk", sans-serif');
+    state.font = true;
+    log('› 注入：--font-sans 指向不存在的字体 "Ghost Grotesk"（肉眼几乎看不出来）', 'act');
+    runValidate('弄坏字体之后');
+  });
+
+  $('#btn-band').addEventListener('click', function () {
+    if (state.band) { log('› 版块已经被撑爆了——先点「全部修复」', 'dim'); return; }
+    var g = document.querySelector('#victim .g');
+    var bomb = document.createElement('div');
+    bomb.id = 'gl-bomb';
+    bomb.setAttribute('data-span', '12');
+    bomb.style.cssText = 'height:280px;border:1px dashed #c8321e;background:repeating-linear-gradient(45deg,rgba(200,50,30,.12),rgba(200,50,30,.12) 8px,transparent 8px,transparent 16px)';
+    g.appendChild(bomb);
+    state.band = true;
+    log('› 注入：向 data-h=568 的示例版块塞进 280px 额外内容', 'act');
+    runValidate('撑爆版块之后');
+  });
+
+  $('#btn-img').addEventListener('click', function () {
+    var img = $('#victimImg');
+    if (!img.dataset.orig) img.dataset.orig = img.getAttribute('src');
+    img.src = 'assets/gelv/__missing__.png';
+    state.img = true;
+    log('› 注入：示例版块的图片 src 指向不存在的文件', 'act');
+    runValidate('打断图片之后');
+  });
+
+  $('#btn-publish').addEventListener('click', function () {
+    log('$ node scripts/cli.js publish gelv', 'dim');
+    runValidate('发布门禁').then(function (r) {
+      if (r.errors.length) {
+        log('✕ Publish blocked: contract validation failed (' + r.errors.length + ' errors) — use --force to override.', 'err');
+        log('  拒绝发布。事故不会流到用户面前。', 'err');
+      } else {
+        log('✓ 契约成立 — 允许发布。', 'ok');
+      }
+    });
+  });
+
+  $('#btn-fix').addEventListener('click', function () {
+    document.documentElement.style.removeProperty('--font-sans');
+    var bomb = $('#gl-bomb'); if (bomb) bomb.remove();
+    var img = $('#victimImg'); if (img.dataset.orig) img.src = img.dataset.orig;
+    state = { font: false, band: false, img: false };
+    log('› 修复：还原字体 token、移除注入内容、恢复图片', 'act');
+    runValidate('全部修复之后');
+  });
+
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      // 公开演示默认收起开发面板，保留右上角齿轮入口（网格叠加层在里面）
+      var panel = $('#ctrlPanel'), gear = $('#ctrlToggle');
+      if (panel && !panel.classList.contains('collapsed')) {
+        panel.classList.add('collapsed');
+        if (gear) gear.classList.add('show');
+      }
+      log('格律 · 实时验收控制台 — 本页加载时已自动跑过一次 validate()，结果见右上角徽标。', 'dim');
+      runValidate('页面加载');
+    }, 600);
+  });
+})();
+</script>
+</body>
+</html>
