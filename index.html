@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="engine2.css">
 <style>
 :root {
-  --unit: 8px; --cols: 12; --gutter: 16px; --margin-l: 32px; --margin-r: 32px; --max-w: 1280px;
+  --unit: 8px; --cols: 6; --gutter: 28px; --margin-l: 32px; --margin-r: 32px; --max-w: 1280px;
   --font-sans: system-ui, -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   --font-serif: Georgia, 'Songti SC', 'STSong', 'SimSun', serif;
   --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
@@ -19,7 +19,7 @@
   --c-accent: #ff7a00; --c-on-accent: #111111; --c-on-dark: #f5f5f5;
   --c-border: #e6e6e6;
   --type-h1-size: 56px;  --type-h1-lh: 68px;  --type-h1-wt: 500;
-  --type-h2-size: 32px;  --type-h2-lh: 44px;  --type-h2-wt: 500;
+  --type-h2-size: 32px;  --type-h2-lh: 56px;  --type-h2-wt: 500;
   --type-h3-size: 18px;  --type-h3-lh: 28px;  --type-h3-wt: 600;
   --type-body-size: 16px; --type-body-lh: 28px;
   --type-small-size: 13px; --type-small-lh: 20px;
@@ -32,11 +32,14 @@
 body { -webkit-font-smoothing: antialiased; }
 
 /* ─── 自曝网格：引擎自己的 12 列画在页面上 ─── */
-#gridlines { position: absolute; top: 0; left: 0; right: 0; height: 100vh; pointer-events: none; }
+/* 场(field)网格:模块高4行(112px)+行间沟1行(28px),周期140px;模数=正文一行 */
+#gridlines { position: absolute; top: 64px; left: 0; right: 0; height: 100vh; pointer-events: none; }
 #gridlines .g { height: 100%; grid-template-rows: 100%; align-items: stretch; }
 #gridlines .cell { border-left: 1px dashed rgba(255,122,0,.38); border-right: 1px dashed rgba(255,122,0,.38); }
 #gridrows { position: absolute; inset: 0;
-  background-image: repeating-linear-gradient(to bottom, transparent 0 63px, rgba(255,122,0,.32) 63px 64px);
+  background-image: repeating-linear-gradient(to bottom,
+    rgba(255,122,0,.32) 0 1px, transparent 1px 112px,
+    rgba(255,122,0,.32) 112px 113px, transparent 113px 140px);
   -webkit-mask-image: repeating-linear-gradient(to right, #000 0 6px, transparent 6px 12px);
           mask-image: repeating-linear-gradient(to right, #000 0 6px, transparent 6px 12px);
 }
@@ -57,7 +60,7 @@ body { -webkit-font-smoothing: antialiased; }
 .num-acc { color: var(--c-accent); }
 
 /* ─── 小节骨架：眉标轴 col1 / 主轴 col3 / 副轴 col8 ─── */
-.sec-pad { padding-top: 128px; padding-bottom: 128px; }
+.sec-pad { padding-top: 140px; padding-bottom: 140px; }
 .sec-eyebrow { font-family:var(--font-mono); font-size:12px; letter-spacing:.08em; color:var(--c-muted); text-transform:uppercase; }
 .sec-title { font-size:var(--type-h2-size); line-height:var(--type-h2-lh); }
 .sec-desc { max-width: 40em; }
@@ -106,7 +109,7 @@ footer a { text-decoration:none; }
 
 @media (max-width: 1024px) { #gridlines { display:none; } }
 @media (max-width: 768px) {
-  .sec-pad { padding-top: 64px; padding-bottom: 64px; }
+  .sec-pad { padding-top: 56px; padding-bottom: 56px; }
   .hero-h1 { font-size: clamp(30px, 8vw, 40px); }
   .skin-tile { margin-bottom: 12px; }
   .meta-rail { margin-top: 32px; }
@@ -123,26 +126,23 @@ footer a { text-decoration:none; }
     <div class="cell" style="grid-column:auto/span 1"></div><div class="cell" style="grid-column:auto/span 1"></div>
     <div class="cell" style="grid-column:auto/span 1"></div><div class="cell" style="grid-column:auto/span 1"></div>
     <div class="cell" style="grid-column:auto/span 1"></div><div class="cell" style="grid-column:auto/span 1"></div>
-    <div class="cell" style="grid-column:auto/span 1"></div><div class="cell" style="grid-column:auto/span 1"></div>
-    <div class="cell" style="grid-column:auto/span 1"></div><div class="cell" style="grid-column:auto/span 1"></div>
-    <div class="cell" style="grid-column:auto/span 1"></div><div class="cell" style="grid-column:auto/span 1"></div>
   </div>
 </div>
 
 <!-- ═══ NAV ═══ -->
 <header data-band="nav" data-h="64" style="border-bottom:1px solid var(--c-border)">
   <div class="g" style="align-content:center">
-    <div data-span="2" style="display:flex;align-items:baseline;gap:8px">
+    <div data-span="1" style="display:flex;align-items:baseline;gap:8px">
       <span class="brand" style="font-size:20px">格律</span>
       <span class="tag">GELÜ · V2</span>
     </div>
-    <nav class="ts" data-span="6" data-start="3" data-hide-md style="align-self:center;display:flex;gap:32px">
+    <nav class="ts" data-span="3" data-start="2" data-hide-md style="align-self:center;display:flex;gap:32px">
       <a class="ul" href="#skins" data-t="nav1">换版式</a>
       <a class="ul" href="#gate" data-t="nav2">验收门禁</a>
       <a class="ul" href="#fidelity" data-t="nav3">重建保真</a>
       <a class="ul" href="#why" data-t="nav4">为什么</a>
     </nav>
-    <div data-span="4" data-start="9" style="align-self:center;display:flex;justify-content:flex-end;align-items:center;gap:14px">
+    <div data-span="2" data-start="5" style="align-self:center;display:flex;justify-content:flex-end;align-items:center;gap:14px">
       <button class="tag" id="lang-toggle" type="button" style="cursor:pointer;border:1px solid var(--c-border)">EN</button>
       <button class="tag" id="grid-toggle" type="button" style="cursor:pointer;border:1px solid var(--c-border)" data-t="grid_on">网格线 开</button>
       <span class="ts" data-hide-sm data-t="nav_live">实时验收</span><span id="v2badge" class="td" style="font-size:12px"></span>
@@ -151,10 +151,10 @@ footer a { text-decoration:none; }
 </header>
 
 <!-- ═══ HERO：纯文字宣言，双色调 H1，左对齐主轴 col3 ═══ -->
-<section data-band="hero" data-h="640" data-clip>
+<section data-band="hero" data-h="700" data-clip>
   <div class="g" style="align-content:center;padding-top:32px">
-    <div data-span="8" data-start="3">
-      <p class="hero-mono" id="scramble" data-anim="fade-in">BAND / GRID · 12-COL · 8PX · VALIDATE() · PUBLISH-GATE</p>
+    <div data-span="4" data-start="2">
+      <p class="hero-mono" id="scramble" data-anim="fade-in">BAND / FIELD · 6-COL · 4-LINE MODULE · 28PX BASELINE · GATE</p>
       <h1 class="hero-h1 hx" style="margin-top:24px" data-anim="slide-up" data-t="hero_h1">
         <span class="l1">AI 会写界面了，</span>
         <span class="l2">还没有人对<span style="white-space:nowrap">「好不好看」</span>负责。</span>
@@ -168,7 +168,7 @@ footer a { text-decoration:none; }
         <a class="btn" href="#gate" data-t="cta2">看验收门禁</a>
       </div>
     </div>
-    <div class="meta-rail" data-span="2" data-start="11" data-hide-md data-anim="fade-in" data-anim-delay="450">
+    <div class="meta-rail" data-span="1" data-start="6" data-hide-md data-anim="fade-in" data-anim-delay="450">
       <div class="row"><span>ENGINE</span><span>V2 · 392 L</span></div>
       <div class="row"><span>FIDELITY</span><span class="num-acc">0.989</span></div>
       <div class="row"><span>GATE</span><span>publish</span></div>
@@ -176,27 +176,27 @@ footer a { text-decoration:none; }
     </div>
   </div>
   <div class="free ts" style="left:32px;bottom:18px;color:var(--c-muted)">
-    <span data-t="freecap">本页由格律 v2 构建 · 加载即通过自身验收 · 背景虚线即引擎自己的 12 列网格与 64px 行模块</span>
+    <span data-t="freecap">本页由格律 v2 构建 · 加载即通过自身验收 · 背景虚线即引擎自己的 6 列 × 4 行模块场，沟为一空行——模数是正文的一行</span>
   </div>
 </section>
 
 <!-- ═══ 01 问题 ═══ -->
 <section data-band="section" style="border-top:1px solid var(--c-border)">
   <div class="g sec-pad">
-    <div class="sec-eyebrow" data-span="2" data-t="e1">01 · 问题</div>
-    <h2 class="sec-title hx" data-span="5" data-start="3" data-t="t1">失败是无声的</h2>
-    <p class="tb sec-desc" data-span="5" data-start="8" data-t="d1">AI 生成页面的错误不报错：字体拿不到就悄悄换一个，容器装不下就悄悄溢出去，栅格坏了就悄悄挤成一列。页面越生成越多，人肉逐页检查的成本，正在吃掉 AI 省下的时间。</p>
-    <div data-span="3" data-start="3" class="hairtop" style="margin-top:64px">
+    <div class="sec-eyebrow" data-span="1" data-t="e1">01 · 问题</div>
+    <h2 class="sec-title hx" data-span="2" data-start="2" data-t="t1">失败是无声的</h2>
+    <p class="tb sec-desc" data-span="3" data-start="4" data-t="d1">AI 生成页面的错误不报错：字体拿不到就悄悄换一个，容器装不下就悄悄溢出去，栅格坏了就悄悄挤成一列。页面越生成越多，人肉逐页检查的成本，正在吃掉 AI 省下的时间。</p>
+    <div data-span="2" data-start="1" class="hairtop" style="margin-top:56px">
       <span class="tag">FONT</span>
       <h3 class="th3" style="margin-top:12px" data-t="c1t">字体静默回退</h3>
       <p class="ts" style="margin-top:8px" data-t="c1d">字体没加载成功，浏览器默默换成备选——字宽变了，所有度量随之漂移。</p>
     </div>
-    <div data-span="3" data-start="6" class="hairtop" style="margin-top:64px">
+    <div data-span="2" data-start="3" class="hairtop" style="margin-top:56px">
       <span class="tag">OVERFLOW</span>
       <h3 class="th3" style="margin-top:12px" data-t="c2t">内容悄悄溢出</h3>
       <p class="ts" style="margin-top:8px" data-t="c2d">文案比设计长一点，就挤出容器边界。截图看不出，真机上就是破版。</p>
     </div>
-    <div data-span="3" data-start="9" class="hairtop" style="margin-top:64px">
+    <div data-span="2" data-start="5" class="hairtop" style="margin-top:56px">
       <span class="tag">GRID</span>
       <h3 class="th3" style="margin-top:12px" data-t="c3t">栅格悄然坍塌</h3>
       <p class="ts" style="margin-top:8px" data-t="c3d">一条样式覆盖，八列的元素塌成一列——DOM 里查不出任何「错误」。</p>
@@ -206,14 +206,14 @@ footer a { text-decoration:none; }
 <!-- ═══ 02 换版式（主打互动） ═══ -->
 <section data-band="section" id="skins" style="border-top:1px solid var(--c-border)">
   <div class="g sec-pad">
-    <div class="sec-eyebrow" data-span="2" data-t="e2">02 · 换版式</div>
-    <h2 class="sec-title hx" data-span="5" data-start="3" data-t="t2">同一页内容，换一套版式基因</h2>
-    <p class="tb sec-desc" data-span="5" data-start="8" data-t="d2">下面每套参数，取自我们逐像素重建过的一家顶级设计工作室（重建保真 0.9+）。点击切换：整页实时重排——网格、字级、色彩、圆角一起换，右上角的验收徽标同步复验。<strong>契约不因换肤而松动。</strong></p>
-    <div data-span="10" data-start="3" style="margin-top:56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px">
+    <div class="sec-eyebrow" data-span="1" data-t="e2">02 · 换版式</div>
+    <h2 class="sec-title hx" data-span="2" data-start="2" data-t="t2">同一页内容，换一套版式基因</h2>
+    <p class="tb sec-desc" data-span="3" data-start="4" data-t="d2">下面每套参数，取自我们逐像素重建过的一家顶级设计工作室（重建保真 0.9+）。点击切换：整页实时重排——网格、字级、色彩、圆角一起换，右上角的验收徽标同步复验。<strong>契约不因换肤而松动。</strong></p>
+    <div data-span="5" data-start="2" style="margin-top:56px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px">
       <button class="skin-tile cur" type="button" data-skin-btn="gelv" style="background:#ff7a00;border-color:#ff7a00;color:#111">
         <span class="glyph" style="font-weight:500">格</span>
         <span class="sname" data-t="sk1">格律 · 默认</span>
-        <span class="smeta">12COL · GUT16 · W500</span>
+        <span class="smeta">6COL · GUT28 · W500</span>
       </button>
       <button class="skin-tile" type="button" data-skin-btn="collins" style="background:#f8f8f7;color:#140700">
         <span class="glyph" style="font-family:Georgia,'Songti SC',serif;font-weight:400">格</span>
@@ -231,21 +231,21 @@ footer a { text-decoration:none; }
         <span class="smeta">GUT20 · PILL · R12</span>
       </button>
     </div>
-    <div id="skin-toast" data-span="10" data-start="3" style="margin-top:20px"><span data-t="toast0">→ 当前：格律默认版式 · 点任意一块试试</span></div>
-    <p class="ts" data-span="10" data-start="3" style="margin-top:12px" data-t="note2">说明：这演示的是版式的参数化与验收的稳定性——审美判断仍属于人；哪套「更好看」，正是我们下一步用真人盲评去回答的问题。</p>
+    <div id="skin-toast" data-span="5" data-start="2" style="margin-top:28px"><span data-t="toast0">→ 当前：格律默认版式 · 点任意一块试试</span></div>
+    <p class="ts" data-span="5" data-start="2" style="margin-top:12px" data-t="note2">说明：这演示的是版式的参数化与验收的稳定性——审美判断仍属于人；哪套「更好看」，正是我们下一步用真人盲评去回答的问题。</p>
   </div>
 </section>
 
 <!-- ═══ 03 示例版块（换肤展示体 + 门禁靶子） ═══ -->
-<section data-band="section" data-h="640" id="victim" style="border-top:1px solid var(--c-border)">
-  <div class="g" style="align-content:center;padding-top:48px;padding-bottom:48px">
-    <div data-span="4" data-start="3" style="align-self:center">
-      <span class="tag" data-t="vtag">示例版块 · DATA-H 640</span>
+<section data-band="section" data-h="560" id="victim" style="border-top:1px solid var(--c-border)">
+  <div class="g" style="align-content:center;padding-top:56px;padding-bottom:56px">
+    <div data-span="2" data-start="2" style="align-self:center">
+      <span class="tag" data-t="vtag">示例版块 · DATA-H 560</span>
       <h3 class="th2 hx" style="margin-top:16px" data-t="vt">一个规规矩矩的版块</h3>
-      <p class="tb" style="margin-top:12px" data-t="vd">标题、正文、一张图，各占其位：文字四列、图五列，高度写进契约。换版式时看它变脸；验收演示时它挨打。</p>
+      <p class="tb" style="margin-top:12px" data-t="vd">标题、正文、一张图，各占其位：文字两列、图两列，高度 560 写进契约。换版式时看它变脸；验收演示时它挨打。</p>
       <a class="btn" style="margin-top:20px" href="#gate" data-t="vb">去打它 ↓</a>
     </div>
-    <div data-span="5" data-start="8" style="align-self:center">
+    <div data-span="2" data-start="5" style="align-self:center">
       <div class="media shot" style="--ar:3/2"><img id="victimImg" src="assets/gelv/clay-generated.png" alt="格律 v2 重建站截图（示例图）"></div>
     </div>
   </div>
@@ -254,73 +254,73 @@ footer a { text-decoration:none; }
 <!-- ═══ 04 验收门禁（紧凑暗段） ═══ -->
 <section data-band="section" class="gate" id="gate">
   <div class="g sec-pad">
-    <div class="sec-eyebrow" data-span="2" data-t="e3">03 · 门禁</div>
-    <h2 class="sec-title hx" data-span="5" data-start="3" data-t="t3">出错必须大声</h2>
-    <p class="tb sec-desc" data-span="5" data-start="8" data-t="d3">三个按钮各制造一种真实事故（作用于本页）；「尝试发布」走引擎发布门禁的同一套校验，有错就拒绝发布；「修复」还原。字体那一刀肉眼几乎看不出来——你看不出来，验收器看得出来。</p>
-    <div data-span="10" data-start="3" style="margin-top:40px;display:flex;gap:10px;flex-wrap:wrap">
+    <div class="sec-eyebrow" data-span="1" data-t="e3">03 · 门禁</div>
+    <h2 class="sec-title hx" data-span="2" data-start="2" data-t="t3">出错必须大声</h2>
+    <p class="tb sec-desc" data-span="3" data-start="4" data-t="d3">三个按钮各制造一种真实事故（作用于本页）；「尝试发布」走引擎发布门禁的同一套校验，有错就拒绝发布；「修复」还原。字体那一刀肉眼几乎看不出来——你看不出来，验收器看得出来。</p>
+    <div data-span="5" data-start="2" style="margin-top:56px;display:flex;gap:12px;flex-wrap:wrap">
       <button class="btn" id="btn-font" type="button" data-t="bf">弄坏字体</button>
       <button class="btn" id="btn-band" type="button" data-t="bb">撑爆版块</button>
       <button class="btn" id="btn-img" type="button" data-t="bi">打断图片</button>
       <button class="btn fill" id="btn-publish" type="button" data-t="bp">尝试发布 →</button>
       <button class="btn" id="btn-fix" type="button" data-t="bx">修复</button>
     </div>
-    <div data-span="10" data-start="3" style="margin-top:20px" id="gl-console" aria-live="polite"></div>
+    <div data-span="5" data-start="2" style="margin-top:28px" id="gl-console" aria-live="polite"></div>
   </div>
 </section>
 
 <!-- ═══ 05 重建保真 ═══ -->
 <section data-band="section" id="fidelity" style="border-top:1px solid var(--c-border)">
   <div class="g sec-pad">
-    <div class="sec-eyebrow" data-span="2" data-t="e4">04 · 保真</div>
-    <h2 class="sec-title hx" data-span="5" data-start="3" data-t="t4">契约管「不坏」，保真到 0.989</h2>
-    <p class="tb sec-desc" data-span="5" data-start="8" data-t="d4">用格律 v2 重建 clay.global 首页：动手之前先把通过线写死在 0.65，重建完成后与原站像素相似度 0.989。通过线预注册、时间戳可查——这也是「换版式」里那些工作室参数的来源。</p>
-    <div data-span="5" data-start="3" style="margin-top:56px">
+    <div class="sec-eyebrow" data-span="1" data-t="e4">04 · 保真</div>
+    <h2 class="sec-title hx" data-span="2" data-start="2" data-t="t4">契约管「不坏」，保真到 0.989</h2>
+    <p class="tb sec-desc" data-span="3" data-start="4" data-t="d4">用格律 v2 重建 clay.global 首页：动手之前先把通过线写死在 0.65，重建完成后与原站像素相似度 0.989。通过线预注册、时间戳可查——这也是「换版式」里那些工作室参数的来源。</p>
+    <div data-span="3" data-start="1" style="margin-top:56px">
       <div class="compare-label"><span class="sec-eyebrow">原站 CLAY.GLOBAL</span><span class="ts td">1280 × 15668</span></div>
       <div class="media shot" style="--ar:4/5"><img src="assets/gelv/clay-original.png" alt="clay.global 原站完整页截图（顶部）"></div>
     </div>
-    <div data-span="5" data-start="8" style="margin-top:56px">
+    <div data-span="3" data-start="4" style="margin-top:56px">
       <div class="compare-label"><span class="sec-eyebrow num-acc" data-t="lrb">格律 V2 重建</span><span class="ts td num-acc">SIMILARITY 0.989</span></div>
       <div class="media shot" style="--ar:4/5"><img src="assets/gelv/clay-generated.png" alt="格律 v2 重建站完整页截图（顶部）"></div>
     </div>
-    <div data-span="2" data-start="3" class="stat hairtop" style="margin-top:48px"><span class="td num-acc">0.989</span><span class="ts" data-t="s1">像素相似度（线 0.65）</span></div>
-    <div data-span="2" data-start="5" class="stat hairtop" style="margin-top:48px"><span class="td">0.956</span><span class="ts" data-t="s2">第二试点（线 0.75）</span></div>
-    <div data-span="2" data-start="7" class="stat hairtop" style="margin-top:48px"><span class="td">9 / 10</span><span class="ts" data-t="s3">重建站 ≥ 0.89</span></div>
-    <div data-span="2" data-start="9" class="stat hairtop" style="margin-top:48px"><span class="td">392 行</span><span class="ts" data-t="s4">v2 运行时（v1 1557）</span></div>
-    <p class="ts" data-span="8" data-start="3" style="margin-top:32px" data-t="fine4">原站截图版权归 clay.global 所有，仅作研究对比。保真度衡量像素相似度——布局能力的证据，不是审美评分。</p>
+    <div data-span="1" data-start="2" class="stat hairtop" style="margin-top:56px"><span class="td num-acc">0.989</span><span class="ts" data-t="s1">像素相似度（线 0.65）</span></div>
+    <div data-span="1" data-start="3" class="stat hairtop" style="margin-top:56px"><span class="td">0.956</span><span class="ts" data-t="s2">第二试点（线 0.75）</span></div>
+    <div data-span="1" data-start="4" class="stat hairtop" style="margin-top:56px"><span class="td">9 / 10</span><span class="ts" data-t="s3">重建站 ≥ 0.89</span></div>
+    <div data-span="1" data-start="5" class="stat hairtop" style="margin-top:56px"><span class="td">392 行</span><span class="ts" data-t="s4">v2 运行时（v1 1557）</span></div>
+    <p class="ts" data-span="4" data-start="2" style="margin-top:28px" data-t="fine4">原站截图版权归 clay.global 所有，仅作研究对比。保真度衡量像素相似度——布局能力的证据，不是审美评分。</p>
   </div>
 </section>
 
 <!-- ═══ 06 为什么不打分 ═══ -->
 <section data-band="section" id="why" style="border-top:1px solid var(--c-border)">
   <div class="g sec-pad">
-    <div class="sec-eyebrow" data-span="2" data-t="e5">05 · 立场</div>
-    <h2 class="sec-title hx" data-span="5" data-start="3" data-t="t5">为什么只验收、不打「美学分」</h2>
-    <p class="tb sec-desc" data-span="5" data-start="8" data-t="d5">因为我们把「打分」亲手证伪了：一个约 25 行、只会把间距凑成整数的投机脚本，在网格指标上拿了 78.70——高过我们 1535 行的引擎（67.73），也高过顶级人类名站的组均值（72.98）。任何确定性的美学分数都会被刷穿。</p>
-    <div data-span="10" data-start="3" style="margin-top:48px">
+    <div class="sec-eyebrow" data-span="1" data-t="e5">05 · 立场</div>
+    <h2 class="sec-title hx" data-span="2" data-start="2" data-t="t5">为什么只验收、不打「美学分」</h2>
+    <p class="tb sec-desc" data-span="3" data-start="4" data-t="d5">因为我们把「打分」亲手证伪了：一个约 25 行、只会把间距凑成整数的投机脚本，在网格指标上拿了 78.70——高过我们 1535 行的引擎（67.73），也高过顶级人类名站的组均值（72.98）。任何确定性的美学分数都会被刷穿。</p>
+    <div data-span="5" data-start="2" style="margin-top:56px">
       <p class="tb lead-max" data-t="w5"><strong>确定性属于契约（保下限），不属于审美（打分）。</strong>所以格律只拦客观错误、只警告不强制风格；「美」的上限，我们用真人盲评验证过的信号去逼近——那也是「换版式」之后的下一步。</p>
     </div>
-    <div data-span="2" data-start="3" class="stat hairtop" style="margin-top:40px"><span class="td">78.70</span><span class="ts" data-t="ws1">25 行投机脚本</span></div>
-    <div data-span="2" data-start="5" class="stat hairtop" style="margin-top:40px"><span class="td">67.73</span><span class="ts" data-t="ws2">1535 行引擎 v1</span></div>
-    <div data-span="2" data-start="7" class="stat hairtop" style="margin-top:40px"><span class="td">72.98</span><span class="ts" data-t="ws3">人类名站组均</span></div>
-    <div data-span="2" data-start="9" class="stat hairtop" style="margin-top:40px"><span class="td num-acc">97.65</span><span class="ts" data-t="ws4">引擎窄屏重排（脚本仅 41.80）</span></div>
+    <div data-span="1" data-start="2" class="stat hairtop" style="margin-top:56px"><span class="td">78.70</span><span class="ts" data-t="ws1">25 行投机脚本</span></div>
+    <div data-span="1" data-start="3" class="stat hairtop" style="margin-top:56px"><span class="td">67.73</span><span class="ts" data-t="ws2">1535 行引擎 v1</span></div>
+    <div data-span="1" data-start="4" class="stat hairtop" style="margin-top:56px"><span class="td">72.98</span><span class="ts" data-t="ws3">人类名站组均</span></div>
+    <div data-span="1" data-start="5" class="stat hairtop" style="margin-top:56px"><span class="td num-acc">97.65</span><span class="ts" data-t="ws4">引擎窄屏重排（脚本仅 41.80）</span></div>
   </div>
 </section>
 
 <!-- ═══ FOOTER ═══ -->
-<footer data-band="footer" data-h="320" data-distribute="between" style="border-top:1px solid var(--c-ink)">
-  <div class="g" style="padding-top:64px">
-    <div data-span="6" data-start="1">
+<footer data-band="footer" data-h="280" data-distribute="between" style="border-top:1px solid var(--c-ink)">
+  <div class="g" style="padding-top:56px">
+    <div data-span="3" data-start="1">
       <span class="brand" style="font-size:36px">格律 <span class="tag">GELÜ</span></span>
       <p class="tb on-dark-body" style="margin-top:16px;max-width:460px" data-t="ftag">AI 产出的质量层：下限用契约保证，上限用可信的评测逼近。先有格律，再有诗。</p>
     </div>
-    <div data-span="3" data-start="9" class="ts on-dark-body">
+    <div data-span="2" data-start="5" class="ts on-dark-body">
       <p class="sec-eyebrow" data-t="fc1">CONTACT · 联系</p>
       <p style="margin-top:8px" data-t="fc2">申请材料与完整实验报告备索<br><span class="td">【邮箱待填】</span></p>
     </div>
   </div>
   <div class="g" style="padding-bottom:24px">
-    <div data-span="8"><span class="ts on-dark-muted" data-t="flegal">本页由格律 v2 构建（band/grid 契约 + 只读校验器 + 发布门禁），加载与每次换版式后均通过自身验收。© 2026 格律</span></div>
-    <div data-span="4" style="text-align:right"><span class="ts td on-dark-muted">band/grid · validate() · publish gate</span></div>
+    <div data-span="4"><span class="ts on-dark-muted" data-t="flegal">本页由格律 v2 构建（band/grid 契约 + 只读校验器 + 发布门禁），加载与每次换版式后均通过自身验收。© 2026 格律</span></div>
+    <div data-span="2" style="text-align:right"><span class="ts td on-dark-muted">band/grid · validate() · publish gate</span></div>
   </div>
 </footer>
 <script src="engine2.js"></script>
@@ -333,7 +333,7 @@ footer a { text-decoration:none; }
   /* ═══ 版式基因（换肤）：参数取自重建研究 ═══ */
   var SKINS = {
     gelv: { name: '格律 · 默认', nameEn: 'Gelü · Default', tokens: {
-      '--gutter':'16px','--margin-l':'32px','--margin-r':'32px',
+      '--gutter':'28px','--margin-l':'32px','--margin-r':'32px',
       '--font-sans':"system-ui, -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif",
       '--font-display':'var(--font-sans)',
       '--c-bg':'#ffffff','--c-bg-alt':'#f2f2f2','--c-bg-dark':'#141414','--c-ink':'#1a1a1a','--c-body':'#3d3d3d','--c-muted':'#8c8c8c',
@@ -383,7 +383,7 @@ footer a { text-decoration:none; }
     hero_h1:'<span class="l1">AI writes interfaces now —</span><span class="l2">no one answers for <span style="white-space:nowrap">how they look</span>.</span>',
     hero_lead:'Gelü is a harness for AI: the model generates, Gelü enforces. A layout contract guards the floor — never broken — while human-validated taste signals push the ceiling toward better.',
     cta1:'Switch layout genes ↓', cta2:'See the gate',
-    freecap:'Built and validated by Gelü v2 itself · the dashed lines are the engine&rsquo;s own 12-column grid and 64px row module',
+    freecap:'Built and validated by Gelü v2 itself · the dashed fields are its own 6-column × 4-line module grid — the modulus is one line of body text',
     e1:'01 · PROBLEM', t1:'Failure is silent',
     d1:'AI-generated pages fail without errors: fonts silently fall back, content silently overflows, grids silently collapse. As pages multiply, human review eats the very time AI saved.',
     c1t:'Silent font fallback', c1d:'The font never loads; the browser swaps in a substitute. Every metric drifts — and the page says nothing.',
@@ -394,8 +394,8 @@ footer a { text-decoration:none; }
     sk1:'Gelü · Default', sk2:'Collins · Serif paper', sk3:'Basic · Brutalist', sk4:'Clay · Rounded product',
     toast0:'→ Current: Gelü default · try any tile',
     note2:'Note: this demonstrates parameterization and contract stability — aesthetic judgment still belongs to humans. Which one looks best is precisely what our human blind panel answers next.',
-    vtag:'SAMPLE BAND · DATA-H 640', vt:'A well-behaved band',
-    vd:'A heading, a paragraph, one image — text takes four columns, the image five, the height is written into the contract. Watch it change skins above; watch it take the hits below.',
+    vtag:'SAMPLE BAND · DATA-H 560', vt:'A well-behaved band',
+    vd:'A heading, a paragraph, one image — text takes two columns, the image two, height 560 written into the contract. Watch it change skins above; watch it take the hits below.',
     vb:'Hit it ↓',
     e3:'03 · GATE', t3:'Errors must be loud',
     d3:'Three buttons stage three real accidents on this very page. Try publish runs the same checks as the engine&rsquo;s publish gate — errors block the release; Repair restores. The font cut is nearly invisible to the eye: you can&rsquo;t see it, the validator can.',
@@ -417,7 +417,7 @@ footer a { text-decoration:none; }
     zh: { m_hold:'契约成立', boot:'格律 · 实时验收控制台 — 本页加载时已自动 validate()，结果见右上角徽标。',
       lab_load:'页面加载', lab_font:'弄坏字体之后', lab_band:'撑爆版块之后', lab_img:'打断图片之后', lab_gate:'发布门禁', lab_fix:'全部修复之后',
       inj_font:'› 注入：--font-sans 指向不存在的字体 "Ghost Grotesk"（肉眼几乎看不出来）',
-      inj_band:'› 注入：向 data-h=640 的示例版块塞进 280px 额外内容', band_dup:'› 版块已经被撑爆了——先点「修复」',
+      inj_band:'› 注入：向 data-h=560 的示例版块塞进 280px 额外内容', band_dup:'› 版块已经被撑爆了——先点「修复」',
       inj_img:'› 注入：示例版块的图片 src 指向不存在的文件',
       pb2:'  拒绝发布。事故不会流到用户面前。', pub_ok:'✓ 契约成立 — 允许发布。',
       fixmsg:'› 修复：还原字体 token、移除注入内容、恢复图片',
@@ -425,7 +425,7 @@ footer a { text-decoration:none; }
     en: { m_hold:'contract holds', boot:'Gelü · live acceptance console — validate() ran automatically on load; see the badge top right.',
       lab_load:'page load', lab_font:'after breaking the font', lab_band:'after bursting the band', lab_img:'after breaking the image', lab_gate:'publish gate', lab_fix:'after repair',
       inj_font:'› inject: --font-sans now points to a nonexistent font "Ghost Grotesk" (nearly invisible to the eye)',
-      inj_band:'› inject: 280px of extra content pushed into the data-h=640 sample band', band_dup:'› band already burst — hit Repair first',
+      inj_band:'› inject: 280px of extra content pushed into the data-h=560 sample band', band_dup:'› band already burst — hit Repair first',
       inj_img:'› inject: sample image src now points to a missing file',
       pb2:'  Release refused. Accidents never reach your users.', pub_ok:'✓ Contract holds — publish allowed.',
       fixmsg:'› repair: font token restored, injected content removed, image recovered',
@@ -471,7 +471,7 @@ footer a { text-decoration:none; }
   /* ═══ 网格覆盖层:高度跟随文档,行线与内容同滚 ═══ */
   function syncGrid() {
     var g = $('#gridlines'); if (!g) return;
-    g.style.height = document.body.scrollHeight + 'px';
+    g.style.height = Math.max(0, document.body.scrollHeight - 64) + 'px';
   }
   if (window.ResizeObserver) new ResizeObserver(syncGrid).observe(document.body);
   window.addEventListener('load', syncGrid);
